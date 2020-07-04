@@ -1,6 +1,7 @@
 package router
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,9 +13,9 @@ import (
 )
 
 type userAPI interface {
-	Register(req *userapi.RegisterRequest) (*userapi.RegisterResponse, error)
-	// Login(req *LoginRequest) (*LoginResponse, error)
-	// Check(req *CheckRequest) (*CheckResponse, error)
+	Register(ctx context.Context, req *userapi.RegisterRequest) (*userapi.RegisterResponse, error)
+	// Login(req *userapi.LoginRequest) (*userapi.LoginResponse, error)
+	// Check(req *userapi.CheckRequest) (*userapi.CheckResponse, error)
 }
 
 type router struct {
@@ -35,28 +36,18 @@ func New(
 
 func (srv *router) setupChiRouter() chi.Router {
 	rt := chi.NewRouter()
-	rt.Route("/v1/user/", func(r chi.Router) {
+	rt.Route("/v1/user", func(r chi.Router) {
 		r.Post("/register", srv.fnRegister) // POST /v1/user/register
-		r.Route("/{userID}", func(r chi.Router) {
-			r.Use(userIDcontext)
-			r.Post("/login", srv.fnLogin) // POST /v1/user/{userID}/login
-		})
+		r.Post("/login", srv.fnLogin)       // POST /v1/user/login
 	})
 	return rt
-}
-
-func userIDcontext(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userID := chi.URLParam(r, "userID")
-		fmt.Printf("user %s\n", userID)
-		next.ServeHTTP(w, r)
-	})
 }
 
 func (srv *router) fnRegister(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		writeError(w, err)
+		return
 	}
 
 	req := new(userapi.RegisterRequest)
@@ -65,7 +56,7 @@ func (srv *router) fnRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := srv.api.Register(req)
+	response, err := srv.api.Register(r.Context(), req)
 	if err != nil {
 		writeError(w, err)
 		return

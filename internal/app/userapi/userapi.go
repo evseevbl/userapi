@@ -1,15 +1,30 @@
 package userapi
 
 import (
+	"context"
 	"errors"
+
+	"github.com/evseevbl/userapi/internal/pkg/store"
 )
 
-func NewImplementation() *implementation {
-	return &implementation{}
+func NewImplementation(
+	storage storage,
+) *implementation {
+	return &implementation{
+		storage: storage,
+	}
 }
 
 type implementation struct {
+	storage storage
 }
+
+type (
+	storage interface {
+		SaveUser(ctx context.Context, user *store.User) (int64, error)
+		GetUserByLogin(ctx context.Context, login string) (*store.User, error)
+	}
+)
 
 type (
 	RegisterRequest struct {
@@ -20,6 +35,7 @@ type (
 	}
 
 	RegisterResponse struct {
+		UserID int64 `json:"user_id"`
 	}
 
 	LoginRequest struct {
@@ -37,4 +53,6 @@ type (
 
 var (
 	ErrNilRequest = errors.New("request is nil")
+	ErrFieldRequired = errors.New("field is required")
+	ErrPasswordMismatch = errors.New("password does not match")
 )

@@ -1,14 +1,49 @@
 package userapi
 
 import (
-	"errors"
-	"fmt"
+	"context"
+
+	"github.com/pkg/errors"
+	"golang.org/x/crypto/bcrypt"
+
+	"github.com/evseevbl/userapi/internal/pkg/store"
 )
 
-func (i *implementation) Register(req *RegisterRequest) (*RegisterResponse, error) {
-	if req == nil {
-		return nil, ErrNilRequest
+func (i *implementation) Register(ctx context.Context, req *RegisterRequest) (*RegisterResponse, error) {
+
+	if err := i.validateRegister(req); err != nil {
+		return nil, errors.Wrap(err, "validation")
 	}
-	fmt.Printf("user %s with email %s\n", req.Login, req.Email)
-	return nil, errors.New("not implemented")
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, errors.Wrap(err, "generate hash")
+	}
+
+	id, err := i.storage.SaveUser(ctx, &store.User{
+		Login:        req.Login,
+		Email:        req.Email,
+		PasswordHash: string(hash),
+	})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "save user")
+	}
+
+	return &RegisterResponse{UserID: id}, nil
+}
+
+func (i *implementation) validateRegister(req *RegisterRequest) error {
+	switch {
+	case req == nil:
+		return ErrNilRequest
+	case req.Login == "":
+		return errors.Wrap(ErrFieldRequired, "login")
+	case req.Email == "":
+		return errors.Wrap(ErrFieldRequired, "email")
+	case req.Phone == "":
+		return errors.Wrap(ErrFieldRequired, "phone")
+	default:
+		return nil
+	}
 }
