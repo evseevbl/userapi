@@ -1,0 +1,30 @@
+### register user
+# curl -X POST localhost:8080/v1/user/register -d '{"email":"vasya@pupkin.ru", "login":"vpupkin2", "phone":"999"}'
+POST localhost:8080/v1/user/register
+Content-Type: application/json
+
+{
+  "email": "vasya@pupkin.ru",
+  "login": "vpupkin2",
+  "phone": "999"
+}
+
+### login with correct password
+# curl -X POST localhost:8080/v1/user/login -d '{"login":"vpupkin", "password":"123"}'
+POST localhost:8080/v1/user/login
+Content-Type: application/json
+
+{
+  "login": "vpupkin",
+  "password": "123"
+}
+
+### login with incorrect password
+# curl -X POST localhost:8080/v1/user/login -d '{"login":"vpupkin", "password":"123"}'
+POST localhost:8080/v1/user/login
+Content-Type: application/json
+
+{
+  "login": "vpupkin",
+  "password": "456"
+}
