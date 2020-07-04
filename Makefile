@@ -6,5 +6,4 @@ mock:
 
 .PHONY: tests
 tests:
-	go test ./...
 	go test ./... -tags=integration

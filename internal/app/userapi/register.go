@@ -39,6 +39,8 @@ func (i *implementation) validateRegister(req *RegisterRequest) error {
 		return errors.Wrap(ErrEmptyField, "login")
 	case req.Password == "":
 		return errors.Wrap(ErrEmptyField, "password")
+	case len(req.Password) < i.minPasswordLength:
+		return errors.New("password too short")
 	case req.Email == "":
 		return errors.Wrap(ErrEmptyField, "email")
 	case req.Phone == "":

@@ -2,30 +2,49 @@ package userapi
 
 import (
 	"context"
-	"errors"
+
+	"github.com/pkg/errors"
 
 	"github.com/evseevbl/userapi/internal/pkg/store"
 )
 
+const defaultMinPasswordLength = 8
+
 func NewImplementation(
 	storage storage,
+	options ...opt,
 ) *implementation {
-	return &implementation{
-		storage: storage,
+	i := &implementation{
+		storage:           storage,
+		minPasswordLength: defaultMinPasswordLength,
 	}
+
+	for _, option := range options {
+		option(i)
+	}
+	return i
 }
 
 type implementation struct {
-	storage storage
+	minPasswordLength int
+	storage           storage
 }
 
-type (
-	storage interface {
-		SaveUser(ctx context.Context, user *store.User) (int64, error)
-		GetUserByLogin(ctx context.Context, login string) (*store.User, error)
-	}
-)
+type opt func(*implementation)
 
+// WithMinPasswordLength changes default password requirement
+func WithMinPasswordLength(length int) opt {
+	return func(i *implementation) {
+		i.minPasswordLength = length
+	}
+}
+
+type storage interface {
+	SaveUser(ctx context.Context, user *store.User) (int64, error)
+	GetUserByLogin(ctx context.Context, login string) (*store.User, error)
+}
+
+// request and response types
 type (
 	RegisterRequest struct {
 		Login    string `json:"login"`

@@ -28,8 +28,11 @@ func main() {
 		log.Fatal(errors.Wrap(err, "cannot connect to db"))
 	}
 
-	store := pgstore.New(db)                // storage
-	api := userapi.NewImplementation(store) // userAPI
+	store := pgstore.New(db) // storage
+	api := userapi.NewImplementation(
+		store,
+		userapi.WithMinPasswordLength(6),
+	) // userAPI
 	srv := router.New(api)
 
 	fmt.Println("userapi started")

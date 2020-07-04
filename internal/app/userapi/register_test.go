@@ -47,7 +47,7 @@ func TestImplementation_Register(t *testing.T) {
 	}
 
 	s := NewStorageMock(t)
-	impl := NewImplementation(s)
+	impl := NewImplementation(s, WithMinPasswordLength(1))
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
