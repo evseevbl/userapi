@@ -28,7 +28,7 @@ func main() {
 		log.Fatal(errors.Wrap(err, "cannot connect to db"))
 	}
 
-	store := pgstore.New(db) // storage
+	store := pgstore.New(db)                // storage
 	api := userapi.NewImplementation(store) // userAPI
 	srv := router.New(api)
 
