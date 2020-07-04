@@ -115,9 +115,11 @@ func addUser(db *sql.DB, u *store.User) error {
 }
 
 func setup(db *sql.DB, dir string) error {
+	// down migrations so all tables get deleted
 	if err := goose.DownTo(db, dir, 0); err != nil {
 		return errors.Wrap(err, "down migrations")
 	}
+	// recreate schema
 	if err := goose.Up(db, dir); err != nil {
 		return errors.Wrap(err, "down migrations")
 	}
