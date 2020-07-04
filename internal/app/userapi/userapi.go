@@ -47,11 +47,6 @@ type (
 		UserID int64 `json:"id"`
 		Token string `json:"token"`
 	}
-
-	CheckRequest struct {
-		UserID int64
-		Token string
-	}
 )
 
 var (

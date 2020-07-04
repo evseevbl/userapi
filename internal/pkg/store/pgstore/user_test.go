@@ -22,6 +22,8 @@ import (
 const migrationDir = "./migrations"
 
 func TestS_SaveAndGetUser(t *testing.T) {
+	// a simple test for the basic scenario (save, then get)
+
 	dsn := os.Getenv("TESTING_DSN")
 	if dsn == "" {
 		t.Fatal("TESTING_DSN must be set for integration tests")
@@ -29,11 +31,10 @@ func TestS_SaveAndGetUser(t *testing.T) {
 
 	a := assert.New(t)
 
+	// connect to database and make storage
 	db, err := sqlx.Connect("postgres", dsn)
 	a.NoError(err, "database conn")
-
 	defer db.Close()
-
 	s := New(db)
 
 	testCases := []struct {
@@ -47,7 +48,7 @@ func TestS_SaveAndGetUser(t *testing.T) {
 			name:         "just one user",
 			prepareUsers: nil,
 			errCheck:     a.NoError,
-			user:         &store.User{
+			user: &store.User{
 				Login:        "test",
 				Email:        "test@test",
 				PasswordHash: "asdfasdf",
@@ -55,7 +56,7 @@ func TestS_SaveAndGetUser(t *testing.T) {
 			},
 		},
 		{
-			name:         "login already exists",
+			name: "login already exists",
 			prepareUsers: []*store.User{
 				{
 					Login:        "test",
@@ -64,8 +65,8 @@ func TestS_SaveAndGetUser(t *testing.T) {
 					Phone:        "1",
 				},
 			},
-			errCheck:     a.Error, // expect an error
-			user:         &store.User{
+			errCheck: a.Error, // expect an error
+			user: &store.User{
 				Login:        "test",
 				Email:        "test2@test",
 				PasswordHash: "222",

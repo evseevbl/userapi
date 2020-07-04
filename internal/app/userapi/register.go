@@ -24,7 +24,6 @@ func (i *implementation) Register(ctx context.Context, req *RegisterRequest) (*R
 		Email:        req.Email,
 		PasswordHash: string(hash),
 	})
-
 	if err != nil {
 		return nil, errors.Wrap(err, "save user")
 	}

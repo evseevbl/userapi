@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // registers `postgres` driver
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
@@ -15,17 +17,21 @@ import (
 )
 
 func main() {
+	dsn := os.Getenv("DATABASE_DSN")
+
 	db, err := sqlx.Connect(
 		"postgres",
-		"host=localhost dbname=userapi user=postgres password=postgres port=5432 sslmode=disable",
+		dsn,
 	)
 
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "cannot open db"))
+		log.Fatal(errors.Wrap(err, "cannot connect to db"))
 	}
 
-	store := pgstore.New(db)
-	api := userapi.NewImplementation(store)
+	store := pgstore.New(db) // storage
+	api := userapi.NewImplementation(store) // userAPI
 	srv := router.New(api)
+
+	fmt.Println("userapi started")
 	log.Fatal(http.ListenAndServe(":8080", srv))
 }

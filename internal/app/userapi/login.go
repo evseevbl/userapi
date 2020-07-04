@@ -2,6 +2,8 @@ package userapi
 
 import (
 	"context"
+	"fmt"
+	"math/rand"
 
 	"github.com/pkg/errors"
 )
@@ -21,7 +23,8 @@ func (i *implementation) Login(ctx context.Context, req *LoginRequest) (*LoginRe
 		return nil, errors.Wrap(err, "password check")
 	}
 
-	return &LoginResponse{UserID: user.ID, Token: "foobar"}, nil
+	// token mechanism is yet to be implemented
+	return &LoginResponse{UserID: user.ID, Token: fmt.Sprintf("#%d", rand.Uint64())}, nil
 }
 
 func (i *implementation) validateLogin(req *LoginRequest) error {
