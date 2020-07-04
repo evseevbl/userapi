@@ -14,8 +14,7 @@ import (
 
 type userAPI interface {
 	Register(ctx context.Context, req *userapi.RegisterRequest) (*userapi.RegisterResponse, error)
-	// Login(req *userapi.LoginRequest) (*userapi.LoginResponse, error)
-	// Check(req *userapi.CheckRequest) (*userapi.CheckResponse, error)
+	Login(ctx context.Context, req *userapi.LoginRequest) (*userapi.LoginResponse, error)
 }
 
 type router struct {
@@ -23,6 +22,7 @@ type router struct {
 	http.Handler
 }
 
+// New constructor
 func New(
 	api userAPI,
 ) http.Handler {
@@ -65,7 +65,24 @@ func (srv *router) fnRegister(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *router) fnLogin(w http.ResponseWriter, r *http.Request) {
-	return
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	req := new(userapi.LoginRequest)
+	if err := json.Unmarshal(body, req); err != nil {
+		writeError(w, err)
+		return
+	}
+
+	response, err := srv.api.Login(r.Context(), req)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	writeResponse(w, response)
 }
 
 func writeResponse(w http.ResponseWriter, resp interface{}) {

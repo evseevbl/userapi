@@ -18,3 +18,11 @@ func (i *implementation) checkUserPassword(user *store.User, password string) er
 		return errors.Wrap(err, "bcrypt error")
 	}
 }
+
+func (i *implementation) generatePasswordHash(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", errors.Wrap(err, "hash from password")
+	}
+	return string(hash), nil
+}

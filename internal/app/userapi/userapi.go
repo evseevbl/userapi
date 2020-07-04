@@ -39,20 +39,23 @@ type (
 	}
 
 	LoginRequest struct {
+		Login    string `json:"login"`
+		Password string `json:"password"`
 	}
 
 	LoginResponse struct {
+		UserID int64 `json:"id"`
+		Token string `json:"token"`
 	}
 
 	CheckRequest struct {
-	}
-
-	CheckResponse struct {
+		UserID int64
+		Token string
 	}
 )
 
 var (
-	ErrNilRequest = errors.New("request is nil")
-	ErrFieldRequired = errors.New("field is required")
+	ErrNilRequest       = errors.New("request is nil")
+	ErrEmptyField       = errors.New("field cannot be empty")
 	ErrPasswordMismatch = errors.New("password does not match")
 )

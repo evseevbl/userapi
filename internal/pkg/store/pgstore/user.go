@@ -9,7 +9,7 @@ import (
 	"github.com/evseevbl/userapi/internal/pkg/store"
 )
 
-func (s *s) SaveUser(ctx context.Context, user *store.User) (int64, error) {
+func (s *storage) SaveUser(ctx context.Context, user *store.User) (int64, error) {
 	q := `
 		insert into "user" (login, password_hash, email, phone)
 		values ($1, $2, $3, $4)
@@ -23,7 +23,7 @@ func (s *s) SaveUser(ctx context.Context, user *store.User) (int64, error) {
 	return id, nil
 }
 
-func (s *s) GetUserByLogin(ctx context.Context, login string) (*store.User, error) {
+func (s *storage) GetUserByLogin(ctx context.Context, login string) (*store.User, error) {
 	q := `
 		select 
 			id, 

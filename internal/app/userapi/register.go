@@ -4,18 +4,17 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	"golang.org/x/crypto/bcrypt"
 
 	"github.com/evseevbl/userapi/internal/pkg/store"
 )
 
 func (i *implementation) Register(ctx context.Context, req *RegisterRequest) (*RegisterResponse, error) {
-
+	// check that all required fields are present
 	if err := i.validateRegister(req); err != nil {
 		return nil, errors.Wrap(err, "validation")
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	hash, err := i.generatePasswordHash(req.Password)
 	if err != nil {
 		return nil, errors.Wrap(err, "generate hash")
 	}
@@ -38,11 +37,13 @@ func (i *implementation) validateRegister(req *RegisterRequest) error {
 	case req == nil:
 		return ErrNilRequest
 	case req.Login == "":
-		return errors.Wrap(ErrFieldRequired, "login")
+		return errors.Wrap(ErrEmptyField, "login")
+	case req.Password == "":
+		return errors.Wrap(ErrEmptyField, "password")
 	case req.Email == "":
-		return errors.Wrap(ErrFieldRequired, "email")
+		return errors.Wrap(ErrEmptyField, "email")
 	case req.Phone == "":
-		return errors.Wrap(ErrFieldRequired, "phone")
+		return errors.Wrap(ErrEmptyField, "phone")
 	default:
 		return nil
 	}

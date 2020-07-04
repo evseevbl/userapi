@@ -1,3 +1,4 @@
+// postgres implementation of `store`
 package pgstore
 
 import (
@@ -6,11 +7,11 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func New(db *sqlx.DB) *s {
-	return &s{db: db}
+func New(db *sqlx.DB) *storage {
+	return &storage{db: db}
 }
 
-type s struct {
+type storage struct {
 	db *sqlx.DB
 }
 

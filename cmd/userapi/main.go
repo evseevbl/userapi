@@ -15,7 +15,6 @@ import (
 )
 
 func main() {
-	// ctx := context.Background()
 	db, err := sqlx.Connect(
 		"postgres",
 		"host=localhost dbname=userapi user=postgres password=postgres port=5432 sslmode=disable",
