@@ -22,7 +22,7 @@ func (i *implementation) Register(ctx context.Context, req *RegisterRequest) (*R
 	id, err := i.storage.SaveUser(ctx, &store.User{
 		Login:        req.Login,
 		Email:        req.Email,
-		PasswordHash: string(hash),
+		PasswordHash: hash,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "save user")
